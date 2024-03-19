@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import basePort from '../basePort';
 
 const ShareWithOthers = ({ sharedpicture }) => {
-    const port = "http://localhost:1000"
+    const port = basePort
     const [inputs, setInputs] = useState({
         emailId: ""
     })

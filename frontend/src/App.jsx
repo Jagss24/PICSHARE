@@ -8,6 +8,7 @@ import YourPics from './components/YourPics';
 import SignUp from './components/SignUp';
 import UploadPics from './components/UploadPics';
 import ShareWithOthers from './components/ShareWithOthers';
+import Modal from './components/Modal';
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path='/your-pics' element={<YourPics />} />
           <Route path='/upload-pics' element={<UploadPics />} />
           <Route path='share-with-others' element={<ShareWithOthers />} />
+          <Route path='/modal' element={<Modal />} />
         </Routes>
       </div>
     </Router>

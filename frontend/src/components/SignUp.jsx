@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
+import basePort from '../basePort';
 
 const SignUp = () => {
     const navigate = useNavigate();
-    const port = 'http://localhost:1000'
+    const port = basePort
     const [inputs, setInputs] = useState({
         firstName: "",
         lastName: "",

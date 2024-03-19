@@ -77,7 +77,7 @@ router.post("/uploadPics", upload.array("images"), async (req, res) => {
     const existingUser = await User.findOne({ emailId });
 
     if (!existingUser) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "There is no Such emailId. Please Signup through this emailID",
       });
     }
@@ -86,7 +86,7 @@ router.post("/uploadPics", upload.array("images"), async (req, res) => {
 
     if (findMail) {
       if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: "Images not uploaded" });
+        return res.status(200).json({ message: "Images not uploaded" });
       }
 
       req.files.forEach((file) => {

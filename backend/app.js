@@ -5,7 +5,6 @@ import conn from "./conn/conn.js";
 conn(process.env.MONGO_URL);
 import auth from "./routes/auth.js";
 import images from "./routes/image.js";
-
 import cors from "cors";
 
 const app = express();

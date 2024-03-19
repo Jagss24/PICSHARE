@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ShareWithOthers from './ShareWithOthers';
+import basePort from '../basePort';
 
 const Pics = ({ pictures }) => {
     const [clickedPic, setClickedPic] = useState(pictures)
     const [share, setShare] = useState(false)
-    const port = "http://localhost:1000"
+    const port = basePort
     const navigate = useNavigate()
     const userData = JSON.parse(sessionStorage.getItem('userData'))
 
@@ -33,7 +34,32 @@ const Pics = ({ pictures }) => {
         await axios.post(`${port}/api/v2/yourPics`, formData)
             .then((res) => alert(res.data.message))
     }
+    async function uploadImages() {
+    const userData = JSON.parse(sessionStorage.getItem('userData'));
+    if (!userData) {
+      // Handle user not logged in
+      return;
+    }
 
+    try {
+      const formData = new FormData();
+      formData.append('emailId', userData.emailId);
+      images.forEach((image) => {
+        formData.append('images', image.file);
+      });
+
+      const response = await axios.post(`${basePort}/uploadPics`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log(response.data); // Handle success response
+
+    } catch (error) {
+      console.error('Error uploading images:', error); // Handle error
+    }
+  }
     return (
         <>
             <div className="relative">
