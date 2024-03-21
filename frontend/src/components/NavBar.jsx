@@ -4,6 +4,7 @@ import { IoMdLogOut } from "react-icons/io";
 
 const NavBar = () => {
     const userData = sessionStorage.getItem('userData')
+    
     return (
         <div className='bg-blue-700 w-full h-16 flex justify-start items-center'>
             <div className='pl-4 text-white text-3xl font-sans cursor-pointer'>
