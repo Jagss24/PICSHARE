@@ -5,6 +5,11 @@ import Pics from './Pics';
 import { GoMirror } from 'react-icons/go';
 
 const CustomWebcam = ({ onPictureTaken }) => {
+    const user = JSON.parse(sessionStorage.getItem('userData'))
+    if (!user) {
+        alert('Please Signin First')
+        window.location.href = '/signin'
+    }
     const webcamRef = useRef(null);
     const [imgSrc, setImgSrc] = useState(null);
     const [mirrored, setMirrored] = useState(false);
