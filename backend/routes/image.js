@@ -3,6 +3,11 @@ import ImageSchema from "../schema/imageSchema.js";
 import User from "../schema/user.js";
 import upload from "../middleware/upload.js";
 import nodemailer from "nodemailer";
+import path,{dirname} from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const router = app.Router();
 
 router.post("/yourPics", upload.single("image"), async (req, res) => {
@@ -81,7 +86,6 @@ router.post("/uploadPics", upload.array("images"), async (req, res) => {
         message: "There is no Such emailId. Please Signup through this emailID",
       });
     }
-
     const findMail = await ImageSchema.findOne({ emailId });
 
     if (findMail) {
@@ -135,6 +139,58 @@ router.post("/uploadPics", upload.array("images"), async (req, res) => {
         res.status(200).json({ message: "Email sent successfully" });
       }
     });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Some error occurred" });
+  }
+});
+
+router.get("/yourPics/:emailId", async (req, res) => {
+  try {
+    const { emailId } = req.params;
+    const exisitingUser = await User.findOne({ emailId });
+    if (exisitingUser) {
+      const findMail = await ImageSchema.findOne({ emailId });
+      if (findMail) {
+        const yourPics = findMail.images;
+        res.status(200).json({ message: "Here's the image", yourPics });
+      } else {
+        res
+          .status(200)
+          .json({ message: "you have not uploaded any image yet" });
+      }
+    } else {
+      res.status(200).json({ message: "User doesn't exist", email: emailId });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Some error occurred" });
+  }
+});
+
+router.delete("/deletePic/:emailId/:imgUrl", async (req, res) => {
+  try {
+    const { emailId, imgUrl } = req.params;
+    const user = await ImageSchema.findOne({ emailId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const imageIndex = user.images.findIndex((img) => img === imgUrl);
+    if (imageIndex !== -1) {
+      const filename = imgUrl.slice(8);
+      console.log(__dirname)
+      const imagePath = path.join(__dirname, "../uploads", filename);
+      // Delete the file from the filesystem
+      fs.unlinkSync(imagePath);
+      user.images.splice(imageIndex, 1); // Remove the image from the array
+      await user.save();
+
+      return res.status(200).json({ message: "Image deleted successfully" });
+    } else {
+      return res.status(404).json({ message: "Image doesn't exist" });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Some error occurred" });
