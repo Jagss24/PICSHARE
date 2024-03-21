@@ -8,8 +8,8 @@ const ImageSchema = new mongoose.Schema({
   images: [
     {
       type: String,
-    }
+    },
   ],
 });
 
-export default mongoose.model("ImageSchema", ImageSchema)
+export default mongoose.model("ImageSchema", ImageSchema);
