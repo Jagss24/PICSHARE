@@ -9,7 +9,11 @@ const UploadPics = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [sending, setsending] = useState(false)
   const fileInPutRef = useRef(null)
-
+  const user = JSON.parse(sessionStorage.getItem('userData'))
+  if (!user) {
+    alert('Please Signin First')
+    window.location.href = '/signin'
+  }
   function selectFiles() {
     fileInPutRef.current.click();
   }
@@ -19,16 +23,32 @@ const UploadPics = () => {
     if (files.length === 0)
       return;
 
-    for (let i = 0; i < files.length; i++) {
-      if (!files[i].type.startsWith("image/"))
-        continue;
+    let totalSize = images.reduce((acc, currImage) => acc + currImage.file.size, 0);
 
-      if (!images.some((e) => e.name === files[i].name)) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith("image/")) {
+        continue;
+      }
+      if (totalSize > 25 * 1024 * 1024) {
+        alert("Can't upload images with total size exceeding 25MB");
+        return;
+      }
+      const newSize = totalSize + file.size;
+
+      if (newSize > 25 * 1024 * 1024) { // 25MB limit
+        alert("Can't upload images with total size exceeding 25MB");
+        return; // Stop further processing
+      }
+
+      totalSize = newSize;
+
+      if (!images.some((e) => e.name === file.name)) {
         setImages((prevImages) => [
           ...prevImages, {
-            name: files[i].name,
-            url: URL.createObjectURL(files[i]),
-            file: files[i]
+            name: file.name,
+            url: URL.createObjectURL(file),
+            file: file
           }
         ]);
       }
@@ -100,9 +120,11 @@ const UploadPics = () => {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
+
       }).then((res) => {
         setsending(false)
-        console.log(res.data)
+        alert(res.data.message)
+        window.location.reload()
       }
       )
         ; // Handle success response
@@ -113,7 +135,7 @@ const UploadPics = () => {
   }
   return (
     <>
-      <Modal />
+      <Modal images={images} />
       <div className='card'>
         <div className='top'>
           <p> Drag & Drop Uploading Images</p>
@@ -142,8 +164,10 @@ const UploadPics = () => {
         </div>
         <button type='button' onClick={uploadbtn}>Upload</button>
         {images.length !== 0 ? <div className='mt-32 text-center hidden' id='btns'>
-          <button className={sending? 'loadin loading-spinner': '' } onClick={uploadImages}>Save to your pics</button>
-          <button onClick={() => document.getElementById('email_modal').showModal()}>Share with others</button>
+          <button onClick={uploadImages} className='btn mr-32'>
+            <span className={sending ? 'loading loading-spinner' : ''}>Save to your pics</span>
+          </button>
+          <button className='btn' onClick={() => document.getElementById('upload_modal').showModal()}>Share with others</button>
         </div> : <></>}
       </div>
     </>
